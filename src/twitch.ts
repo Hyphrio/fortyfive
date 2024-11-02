@@ -52,7 +52,22 @@ class TwitchApi {
   }
 
   public async getNameFromHelixId(id: string): Promise<string> {
-    
+    const cache = await getIdCache(id);
+
+    if (cache) {
+      return cache.name;
+    }
+
+    // If it's not in the cache, fetch the ID from Twitch
+    const helix = await this.apiClient.users.getUserById(id);
+
+    if (helix) {
+      setIdCache(id, helix.name);
+      return helix.name;
+    }
+
+    // If all else fails, reject the Promise
+    return Promise.reject("Invalid user");
   }
 }
 
