@@ -20,7 +20,7 @@ try {
   });
 
   router.get("/twitch/best45", async (ctx) => {
-    ctx.response.body = await getBest45()
+    ctx.response.body = await getBest45(twitchApi)
   })
 
   // router.get("/_internal/reset45", (ctx) => {

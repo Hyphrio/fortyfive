@@ -51,11 +51,18 @@ async function setBest45(id: string, fortyFive: FortyFive) {
     await kv.set(["best45", id], fortyFive)
 }
 
-async function getBest45(): Promise<string> {
+async function getBest45(twitchApi: TwitchApi): Promise<string> {
     const data: Deno.KvEntryMaybe<FortyFive> = await kv.get(["best45"])
+    
 
     if (data.value) {
-        return `${data.value.id}, ${data.value.value}`
+        if (data.value.id) {
+            const name = await twitchApi.getNameFromHelixId(data.value.id);
+
+            return `${name}, ${data.value.value}`
+        } else {
+            return `<anon>, ${data.value.value}`
+        }
     } else {
         return "<anon>"
     }
