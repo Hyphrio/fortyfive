@@ -1,36 +1,47 @@
-const kv = await Deno.openKv();
+class Cache {
+  private key: string
+  private kv?: Deno.Kv
 
-type IdCache = {
-  name: string,
-  id: string
-}
-
-async function getIdCache(name: string): Promise<IdCache | undefined> {
-  const id = await kv.get(idKey(name.toLowerCase()));
-
-  if (id) {
-    return id.value as IdCache;
-  } else {
-    return undefined;
+  constructor(key: string) {
+    this.key = key
   }
-}
 
-async function setIdCache(name: string, id: string): Promise<void> {
-  const idCache: IdCache = {
-    name,
-    id
+  public async getUser(value: UserMaybe): Promise<User | undefined> {
+    return await this.initAndRun((kv) => {
+      if ("id" in value) {
+        const user = kv.get()
+      } else {
+
+      }
+    })
   }
-  await kv.atomic()
-    .set(idKey(name), idCache, thirtyMins)
-    .set(idKey(id), idCache, thirtyMins)
-    .commit()
+
+  public async setUser(value: User): Promise<void> {
+    return await this.initAndRun(async (kv) => {
+      const id = value.id;
+      const name = value.name;
+
+      await kv.atomic()
+        .set(["_cache", this.key, id], )
+
+      return;
+    })
+  }
+
+  private async initAndRun<T>(run: (kv: Deno.Kv) => T | Promise<T>): Promise<T> {
+    if (!this.kv) {
+      this.kv = await Deno.openKv()
+    }
+    return await run(this.kv)
+   }
 }
 
-async function purgeCache(value:string) {
-  
+const 
+ 
+
+type User = {
+  id: string,
+  name: string
 }
 
-const idKey = (name: string) => ["idCache", name];
-const thirtyMins = { expireIn: 1_800_000 };
-
-export { getIdCache, setIdCache, type IdCache };
+type UserMaybe = { id: string } | { name: string }
