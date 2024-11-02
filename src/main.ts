@@ -38,5 +38,4 @@ try {
   app.listen({ port: 8000 });
 } catch (err) {
   console.error(err);
-  Deno.exit(1);
 }
